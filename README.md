@@ -20,6 +20,6 @@ Instalation and utilization guide guide:
 
 
 
-https://github.com/user-attachments/assets/7f5ab833-db06-43f3-9b63-5c5f1a1f0ab6
+https://github.com/user-attachments/assets/f51e6ea0-8ca3-48bc-9dbf-5be01c3cfda6
 
 
