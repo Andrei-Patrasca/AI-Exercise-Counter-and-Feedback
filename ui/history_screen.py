@@ -68,24 +68,30 @@ class HistoryScreen(ctk.CTkFrame):
         right = ctk.CTkFrame(content, fg_color=COLORS["surface"],
                              corner_radius=12)
         right.grid(row=0, column=1, sticky="nsew", padx=(8, 0))
-        right.grid_rowconfigure(1, weight=1)
+        right.grid_rowconfigure(2, weight=1)
         right.grid_columnconfigure(0, weight=1)
 
         self.detail_title = ctk.CTkLabel(
             right, text="Select a session to view details",
             font=FONT_H3, text_color=COLORS["accent"]
         )
-        self.detail_title.grid(row=0, column=0, pady=(16, 8))
+        self.detail_title.grid(row=0, column=0, pady=(16, 2))
+
+        self.time_lbl = ctk.CTkLabel(
+            right, text="",
+            font=("Segoe UI", 12, "bold"),
+            text_color=COLORS["accent"]
+        )
+        self.time_lbl.grid(row=1, column=0, pady=(0, 6))
 
         self.detail_frame = ctk.CTkScrollableFrame(
             right, fg_color=COLORS["surface_alt"], corner_radius=8
         )
-        self.detail_frame.grid(row=1, column=0, sticky="nsew",
+        self.detail_frame.grid(row=2, column=0, sticky="nsew",
                                padx=10, pady=(0, 10))
 
-        # Summary bar at bottom of detail
         self.summary_frame = ctk.CTkFrame(right, fg_color="transparent")
-        self.summary_frame.grid(row=2, column=0, sticky="ew",
+        self.summary_frame.grid(row=3, column=0, sticky="ew",
                                 padx=12, pady=(0, 16))
 
         self._load_workouts()
@@ -142,15 +148,47 @@ class HistoryScreen(ctk.CTkFrame):
             btn.pack(fill="x", padx=6, pady=4)
 
     def _load_detail(self, workout_id, index):
-        """Load the sets for a selected workout into the right panel."""
-        # Clear detail
+        from database.db import get_connection
+        from datetime import datetime
+
+        # Clear panels
         for w in self.detail_frame.winfo_children():
             w.destroy()
         for w in self.summary_frame.winfo_children():
             w.destroy()
 
-        self.detail_title.configure(text=f"Workout {index} — Details")
+        # Get workout times for duration
+        conn = get_connection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT start_time, end_time FROM workouts WHERE id=?",
+            (workout_id,)
+        )
+        row = cur.fetchone()
+        conn.close()
 
+        # Calculate duration string
+        duration_str = ""
+        if row and row["end_time"]:
+            try:
+                fmt = "%H:%M:%S"
+                start = datetime.strptime(row["start_time"], fmt)
+                end = datetime.strptime(row["end_time"], fmt)
+                total = int((end - start).total_seconds())
+                h = total // 3600
+                m = (total % 3600) // 60
+                if h > 0:
+                    duration_str = f"  |  Duration: {h}h {m} min"
+                else:
+                    duration_str = f"  |  Duration: {m} min"
+            except Exception:
+                duration_str = ""
+
+        self.detail_title.configure(
+            text=f"Workout {index} — Details{duration_str}"
+        )
+
+        # Load sets
         sets = self.workout_manager.get_sets(workout_id)
 
         if not sets:
@@ -162,28 +200,28 @@ class HistoryScreen(ctk.CTkFrame):
             ).pack(pady=20)
             return
 
-        # Exercise name mapping
         names = {
             "bicep_curl": "Bicep Curl",
-            "squat":      "Squat",
-            "pushup":     "Push-up"
+            "squat": "Squat",
+            "pushup": "Push-up"
         }
-
         totals = {"bicep_curl": 0, "squat": 0, "pushup": 0}
 
         for s in sets:
-            exercise  = s["exercise"]
-            reps      = s["reps"]
+            exercise = s["exercise"]
+            reps = s["reps"]
             timestamp = s["timestamp"]
             totals[exercise] = totals.get(exercise, 0) + reps
 
-            row = ctk.CTkFrame(self.detail_frame,
-                               fg_color=COLORS["surface"],
-                               corner_radius=8)
-            row.pack(fill="x", padx=6, pady=3)
+            row_frame = ctk.CTkFrame(
+                self.detail_frame,
+                fg_color=COLORS["surface"],
+                corner_radius=8
+            )
+            row_frame.pack(fill="x", padx=6, pady=3)
 
             ctk.CTkLabel(
-                row,
+                row_frame,
                 text=f"  {names.get(exercise, exercise)}",
                 font=FONT_BODY,
                 text_color=COLORS["text"],
@@ -191,26 +229,28 @@ class HistoryScreen(ctk.CTkFrame):
             ).pack(side="left", padx=8, pady=8)
 
             ctk.CTkLabel(
-                row,
-                text=f"{reps} reps",
-                font=("Segoe UI", 13, "bold"),
-                text_color=COLORS["accent"],
-                anchor="e"
-            ).pack(side="right", padx=8, pady=8)
-
-            ctk.CTkLabel(
-                row,
+                row_frame,
                 text=timestamp,
                 font=FONT_SMALL,
                 text_color=COLORS["text_muted"],
                 anchor="e"
             ).pack(side="right", padx=4, pady=8)
 
-        # Summary totals at bottom
-        ctk.CTkLabel(self.summary_frame, text="Totals:",
-                     font=FONT_H3,
-                     text_color=COLORS["text_sub"]).pack(
-            side="left", padx=(0, 12))
+            ctk.CTkLabel(
+                row_frame,
+                text=f"{reps} reps",
+                font=("Segoe UI", 13, "bold"),
+                text_color=COLORS["accent"],
+                anchor="e"
+            ).pack(side="right", padx=8, pady=8)
+
+        # Summary totals
+        ctk.CTkLabel(
+            self.summary_frame,
+            text="Totals:",
+            font=FONT_H3,
+            text_color=COLORS["text_sub"]
+        ).pack(side="left", padx=(0, 12))
 
         for exercise, count in totals.items():
             if count > 0:
