@@ -81,3 +81,22 @@ class AuthManager:
         )
         conn.commit()
         conn.close()
+
+    def update_reminder(self, user_id, reminder_time, reminder_enabled):
+        """Save reminder time and enabled state for a user."""
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute(
+            "UPDATE users SET reminder_time=?, reminder_enabled=? WHERE id=?",
+            (reminder_time, 1 if reminder_enabled else 0, user_id)
+        )
+        conn.commit()
+        conn.close()
+
+    def get_user_by_id(self, user_id):
+        conn = get_connection()
+        cursor = conn.cursor()
+        cursor.execute("SELECT * FROM users WHERE id=?", (user_id,))
+        user = cursor.fetchone()
+        conn.close()
+        return user

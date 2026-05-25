@@ -107,9 +107,12 @@ class App(ctk.CTk):
 
     def _show_account(self):
         from ui.account_screen import AccountScreen
+        from auth.auth_manager import AuthManager
+        # Reload user from DB to get latest reminder settings
+        fresh_user = AuthManager().get_user_by_id(self.current_user["id"])
         self._switch(AccountScreen(
             self,
-            user=self.current_user,
+            user=fresh_user,
             on_back=self._show_dashboard,
             on_logout=self._logout
         ))

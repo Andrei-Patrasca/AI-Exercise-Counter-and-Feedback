@@ -17,14 +17,25 @@ def initialize_database():
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS users (
-            id          INTEGER PRIMARY KEY AUTOINCREMENT,
-            username    TEXT    NOT NULL UNIQUE,
-            email       TEXT    NOT NULL,
-            password    TEXT    NOT NULL,
-            reminder_time TEXT  DEFAULT NULL,
-            reminder_email TEXT DEFAULT NULL
+            id               INTEGER PRIMARY KEY AUTOINCREMENT,
+            username         TEXT    NOT NULL UNIQUE,
+            email            TEXT    NOT NULL,
+            password         TEXT    NOT NULL,
+            reminder_time    TEXT    DEFAULT NULL,
+            reminder_enabled INTEGER DEFAULT 0
         )
     """)
+
+    # Safe migration — adds columns if they don't exist
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN reminder_time TEXT DEFAULT NULL")
+    except Exception:
+        pass
+    try:
+        cursor.execute("ALTER TABLE users ADD COLUMN reminder_enabled INTEGER DEFAULT 0")
+    except Exception:
+        pass
+    conn.commit()
 
     cursor.execute("""
         CREATE TABLE IF NOT EXISTS workouts (
