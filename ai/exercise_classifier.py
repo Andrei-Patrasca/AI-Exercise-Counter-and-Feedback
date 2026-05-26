@@ -54,9 +54,10 @@ class ExerciseClassifier:
             knee_angle  = (self._angle(lh, lk, la) + self._angle(rh, rk, ra)) / 2
             hip_angle   = (self._angle(ls, lh, lk) + self._angle(rs, rh, rk)) / 2
 
+
             if torso_diff < 0.15:
                 prediction = "pushup"
-            elif knee_angle < 145 and torso_diff > 0.15:
+            elif knee_angle < 145 and torso_diff > 0.15 :
                 prediction = "squat"
             elif knee_angle > 150 and hip_angle > 150 and torso_diff > 0.15:
                 prediction = "bicep_curl"
