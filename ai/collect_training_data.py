@@ -1,10 +1,9 @@
 """
-Run this script to record training data for the CNN.
-Press:  P = pushup mode
-        S = squat mode
-        C = bicep_curl mode
-        SPACE = start/stop recording
-        Q = quit and save
+P = pushup mode
+S = squat mode
+C = bicep_curl mode
+SPACE = start/stop recording
+ Q = quit and save
 """
 import cv2
 import csv

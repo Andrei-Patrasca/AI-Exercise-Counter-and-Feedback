@@ -5,7 +5,7 @@ from datetime import datetime
 from ai.pose_estimator import PoseEstimator
 from ai.angle_calculator import AngleCalculator
 from ai.rep_counter import RepCounter
-from ai.exercise_classifier import ExerciseClassifier
+from ai.exercise_classifier_cnn import ExerciseClassifierCNN
 from database.workout_manager import WorkoutManager
 from ui.styles import *
 
@@ -20,7 +20,7 @@ class WorkoutScreen(ctk.CTkFrame):
         self.estimator  = PoseEstimator()
         self.calculator = AngleCalculator()
         self.counter    = RepCounter()
-        self.classifier = ExerciseClassifier()
+        self.classifier = ExerciseClassifierCNN()
 
         # Workout state
         self.workout_manager  = WorkoutManager(user["id"])
@@ -121,6 +121,10 @@ class WorkoutScreen(ctk.CTkFrame):
         )
         self.exercise_lbl.grid(row=0, column=0, pady=(0, 8))
 
+        #heeeeeeeeeeeeeeeeeeeeere time start
+        import time
+        start = time.time()
+
         # Video frame
         self.video_frame = ctk.CTkFrame(
             center, fg_color="#000000", corner_radius=12
@@ -146,6 +150,10 @@ class WorkoutScreen(ctk.CTkFrame):
         )
         self.progress.set(0)
         self.progress.grid(row=3, column=0, pady=(0, 8))
+        # hereeeeeeeeeeeeeeeeeeeeeeeeeeeeee time stop
+        elapsed = time.time() - start
+        print(f"FPS: {1 / elapsed:.1f}")
+
 
     def _build_right(self):
         right = ctk.CTkFrame(self, fg_color=COLORS["surface"],

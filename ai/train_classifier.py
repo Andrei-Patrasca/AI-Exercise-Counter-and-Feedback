@@ -73,6 +73,9 @@ history = model.fit(
     ]
 )
 
+import numpy as np, os
+np.save(os.path.join(os.path.dirname(__file__), "training_history.npy"), history.history)
+
 # Evaluate
 loss, acc = model.evaluate(X_test, y_test)
 print(f"\nTest accuracy: {acc:.2%}")
@@ -80,3 +83,10 @@ print(f"\nTest accuracy: {acc:.2%}")
 # Save
 model.save(MODEL_PATH)
 print(f"Model saved to {MODEL_PATH}")
+
+from sklearn.metrics import classification_report, accuracy_score
+import numpy as np
+
+y_pred = np.argmax(model.predict(X_test, verbose=0), axis=1)
+print("Overall accuracy:", accuracy_score(y_test, y_pred))
+print(classification_report(y_test, y_pred, target_names=encoder.classes_))

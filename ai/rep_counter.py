@@ -1,7 +1,7 @@
 class RepCounter:
     THRESHOLDS = {
         "bicep_curl": {"down": 160, "up": 50},
-        "squat":      {"down": 90,  "up": 160},
+        "squat":      {"down": 100,  "up": 160},
         "pushup":     {"down": 90,  "up": 160},
     }
 

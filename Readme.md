@@ -37,7 +37,7 @@ python -m venv .venv
 Run these commands **in order** — order matters due to numpy compatibility:
 
 ```
-pip install numpy==1.24.3
+pip install numpy==1.25.2
 pip install customtkinter==5.2.2
 pip install opencv-python==4.9.0.80
 pip install ultralytics

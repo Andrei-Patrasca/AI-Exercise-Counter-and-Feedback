@@ -11,7 +11,7 @@ class KeypointProxy:
 
 
 class PoseEstimator:
-    # Only the connections we care about — no face, no bounding box
+    # Only the body connections — no face, no bounding box
     SKELETON_CONNECTIONS = [
         # Torso
         (5, 6),   # left shoulder - right shoulder
